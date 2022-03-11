@@ -11,14 +11,11 @@ const id = url.searchParams.get("id");
 let panierJson = [];
 let panierLinea = localStorage.getItem("panier");
 
+// si le panier importé de localstorage n'est pas nul on le stock dans la variable panierJson
 if(panierLinea !== null){
-  
-  console.log(panierLinea)
 
   panierJson = JSON.parse(panierLinea);
 
-  //panierJson = JSON.parse(panierLinea);
-  console.log(panierJson)
 }
 else{
   console.log("pas de panier enregistré");
@@ -33,6 +30,7 @@ if (url.href.includes("index.html")) {
   })
   .then(function(value) {
 
+      // Pour chaque produit importé par la requette get on construit les éléments du DOM
       for (let item of value) {
         const newElt = document.createElement("a");
         newElt.href = "./product.html?id=" + item._id
@@ -70,6 +68,7 @@ if (id !== null) {
     return res.json();
   })
   .then(function(value) {
+    // On construit les éléments du DOM pour le produits spécifique
     const newEltimage = document.createElement("img");
     newEltimage.src=value.imageUrl;
     newEltimage.alt=value.altTxt;
@@ -108,6 +107,7 @@ if (id !== null) {
 
       let alreadyReserv = 0;
 
+      // On met a jour la nouvelle valeur de quantité de ce produit s'il est déja dans le localstorage
       for (let reservs of panierJson) {
         if (reservs[0] == iditem && reservs[1] == color) {
           reservs[2] =  parseInt(reservs[2]) + parseInt(quantity);
@@ -115,6 +115,7 @@ if (id !== null) {
         }
       }
 
+      // Si le produit n'est pas encore dans le local storage on le rajoute avec la nouvelle valeur de quantité
       if(alreadyReserv == 0){
         let newitem = [iditem,color,quantity];
         panierJson.push(newitem);
@@ -143,12 +144,16 @@ if (url.href.includes("cart.html")) {
 
     let quantityitemall = 0;
     let priceitemall = 0;
+    let increm = 0;
 
+    // On boucle sur toutes les commandes dans le panier
     for (let reservs of panierJson) {
 
+      // On cherche le produit correspondant depuis la requette get a l'API pour avoir les spécificité du produit
       for(let product of value) {
         if(product._id == reservs[0]) {
-
+          // On construit les élément du DOM correspondant a cette commande
+          let localincrem = increm;
           quantityitemall += parseInt(reservs[2]);
           priceitemall += parseInt(reservs[2])*parseInt(product.price);
 
@@ -207,6 +212,15 @@ if (url.href.includes("cart.html")) {
           inputquantity.setAttribute("value",reservs[2]);
           divquantity.appendChild(inputquantity);
 
+          // On ajoute un eventlistener pour mettre a jour les quantité de ce produit de manière dynamique
+          inputquantity.addEventListener('change', function(){
+            
+            producquantity.innerHTML = "Qté : " + inputquantity.value;
+            panierJson[localincrem][2] = inputquantity.value;
+            localStorage.setItem("panier", JSON.stringify(panierJson));
+
+          });
+
           divsettings.appendChild(divquantity);
 
           const divdelete = document.createElement("div");
@@ -217,6 +231,15 @@ if (url.href.includes("cart.html")) {
           deleteitem.innerHTML = "Supprimer";
           divdelete.appendChild(deleteitem);
 
+          // On ajoute un eventlistener pour supprimer cette commande de manière dynamique
+          deleteitem.addEventListener("click", function(){
+            
+            panierJson.splice(localincrem,1);
+            localStorage.setItem("panier", JSON.stringify(panierJson));
+            divdelete.closest("section > article").remove;
+
+          }); 
+
           divsettings.appendChild(divdelete);
 
           divcontent.appendChild(divsettings);
@@ -226,8 +249,11 @@ if (url.href.includes("cart.html")) {
           elt.appendChild(eltarticle);
         }
       }
-      
+
+      increm++;
+
     }
+
     let qtydisplay = document.getElementById("totalQuantity");
     qtydisplay.innerHTML = quantityitemall;
 
@@ -240,3 +266,11 @@ if (url.href.includes("cart.html")) {
   });
 
 }
+
+// On écoute le bouton pour finaliser la commande
+let orderbtn = document.getElementById("order");
+orderbtn.addEventListener("click", function(){
+
+  console.log("commandé !")
+
+});
