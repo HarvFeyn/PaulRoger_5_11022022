@@ -141,6 +141,66 @@ fetch("http://localhost:3000/api/products/")
 let orderbtn = document.getElementById("order");
 orderbtn.addEventListener("click", function(){
 
-  console.log("Commandé");
+  let isvalide = true;
+
+  if(!utils.verifyname(document.getElementById("firstName").value)){
+    document.getElementById("firstNameErrorMsg").innerHTML = "Veuillez remplir un prénom valide";
+    isvalide = false;
+  }
+
+  if(!utils.verifyname(document.getElementById("lastName").value)){
+    document.getElementById("lastNameErrorMsg").innerHTML = "Veuillez remplir un nom valide";
+    isvalide = false;
+  }
+
+  if(!utils.verifyname(document.getElementById("address").value)){
+    document.getElementById("addressErrorMsg").innerHTML = "Veuillez remplir une adresse valide";
+    isvalide = false;
+  }
+
+  if(!utils.verifyname(document.getElementById("city").value)){
+    document.getElementById("cityErrorMsg").innerHTML = "Veuillez remplir ville valide";
+    isvalide = false;
+  }
+  
+  if(!utils.verifyemail(document.getElementById("email").value)){
+    document.getElementById("emailErrorMsg").innerHTML = "Veuillez remplir une adresse email valide";
+    isvalide = false;
+  }
+
+  if(isvalide){
+
+  }
+
+  let objectPost = {
+    contact: {
+      firstName: "test",
+      lastName: "test",
+      address: "test",
+      city: "test",
+      email: "test@gmail.com",
+    },
+    products: ["a6ec5b49bd164d7fbe10f37b6363f9fb"]
+  };
+  
+  let jsonobj = JSON.stringify(objectPost);
+  
+  fetch("http://localhost:3000/api/order", {
+    method: "POST",
+    headers: { 
+      'Accept': 'application/json', 
+      'Content-Type': 'application/json',
+    },
+    body: jsonobj
+  })
+  .then(function(res) {
+    console.log("oui")
+    console.log(res)
+    window.location.href = "./confirmation.html?comm=" + "123456789";
+  })
+  .catch(function(err) {
+    console.log("non")
+    console.log(err)
+  });
 
 });

@@ -26,3 +26,11 @@ if (utils.url.href.includes("cart.html")) {
   require("./dist/panier");
 
 };
+
+// Le javascript executer sur la page confirmation
+
+if (utils.url.href.includes("confirmation.html")) {
+
+  require("./dist/confirm");
+
+};
