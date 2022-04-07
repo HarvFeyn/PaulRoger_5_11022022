@@ -1,12 +1,16 @@
 let utils = require("../utils/utils");
 const storage = require("../utils/storage");
 
+// On appel la fonction pour récupérer le panier depuis le localstorage
 let panierJson = storage.getCart();
 
+// Fonction pour mettre à jour l'afficage du prix et quantité d'item total
 const updatPriceAll = () => {
   let qtydisplay = document.getElementById("totalQuantity");
+  // On appel la fonction qui compte le nombre d'item et on met a jour le DOM
   qtydisplay.innerHTML = storage.getNbrItem();
   let pricedisplay = document.getElementById("totalPrice");
+  // On appel la fonction qui compte le prix total et on met a jour le DOM
   pricedisplay.innerHTML = storage.getPriceAll();
 }
 
@@ -23,8 +27,8 @@ fetch("http://localhost:3000/api/products/")
       for(let product of value) {
         
         if(product._id == reservs.id) {
-          // On construit les élément du DOM correspondant a cette commande
-          
+
+          // On construit les élément du DOM correspondant a cette commande 
           let elt = document.getElementById("cart__items");
 
           const eltarticle = document.createElement("article");
@@ -89,8 +93,10 @@ fetch("http://localhost:3000/api/products/")
             const id = article.dataset.id;
             const color = article.dataset.color;
 
+            // On appel la fonction qui met a jour le panier dans le local storage
             storage.upsertCart({id, color}, inputquantity.value);
 
+            // On appel la fonction pour mettre à jour les quantités et prix
             updatPriceAll();
           });
 
@@ -111,9 +117,13 @@ fetch("http://localhost:3000/api/products/")
             const id = article.dataset.id;
             const color = article.dataset.color;
 
+            // On appel la fonction qui supprime un item du panier dans le localstorage
             storage.deleteItem({id, color});
 
+            // On appel la fonction pour mettre à jour les quantités et prix
             updatPriceAll();
+
+            // on met à jour le DOM en retirant l'article supprimé
             deleteitem.closest("article").remove();
           }); 
 
@@ -129,6 +139,7 @@ fetch("http://localhost:3000/api/products/")
       
     }
     
+    // On appel la fonction pour mettre à jour les quantités et prix
     updatPriceAll();
     
   })
@@ -140,10 +151,11 @@ fetch("http://localhost:3000/api/products/")
 let orderbtn = document.getElementById("order");
 orderbtn.addEventListener("click", event => {
 
+  // On empéche le fonctionnement normal du bouton pour éviter une actualisation de la page
   event.preventDefault();
   let isvalide = true;
   
-
+  // On vérifie tous les paramètres entré dans le formulaire pour qu'ils correspondent bien aux formats attendu
   if(!utils.verifyname(document.getElementById("firstName").value)){
     document.getElementById("firstNameErrorMsg").innerHTML = "Veuillez remplir un prénom valide";
     isvalide = false;
@@ -171,6 +183,7 @@ orderbtn.addEventListener("click", event => {
 
   if(isvalide){
 
+    // On construit l'objet a envoyer a l'API
     const productsToPost = storage.getProductToPost();
 
     let objectPost = {
@@ -184,8 +197,10 @@ orderbtn.addEventListener("click", event => {
       products: productsToPost
     };
     
+    // On transforme l'objet au format JSON pour l'envois a l'API
     let jsonobj = JSON.stringify(objectPost);
   
+    // La requéte a l'API pour envoyer la commande
     fetch("http://localhost:3000/api/products/order", {
       method: "POST",
       headers: { 
@@ -196,11 +211,10 @@ orderbtn.addEventListener("click", event => {
     })
     .then(res => res.json()) 
     .then(function(res) {
-      console.log(JSON.stringify(res));
+      // Si la requéte est bien passée on renvoi vers la page de validation de commande avec le numéro de commande en url
       window.location.href = "./confirmation.html?comm=" + res.orderId;
     })
     .catch(function(err) {
-      console.log("non")
       console.log(err)
     });
   }
