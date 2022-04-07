@@ -3,7 +3,7 @@ require("../css/cart.css");
 require("../css/confirmation.css");
 require("../css/product.css");
 
-let utils = require("./dist/utils");
+let utils = require("./utils/utils");
 
 // javascript a executer sur la page index
 if (utils.url.href.includes("index.html")) {

@@ -1,4 +1,4 @@
-let utils = require("./utils");
+let utils = require("../utils/utils");
 
 fetch("http://localhost:3000/api/products/")
   .then(function(res) {

@@ -1,8 +1,5 @@
-let utils = require("./utils");
-let panier = require("./gestionPanier");
-let panierJson = panier.panierJson;
-
-console.log(panierJson)
+let utils = require("../utils/utils");
+const storage = require("../utils/storage");
 
 fetch("http://localhost:3000/api/products/" + utils.id)
   .then(function(res) {
@@ -45,25 +42,18 @@ fetch("http://localhost:3000/api/products/" + utils.id)
 
       let iditem = value._id;
       let color = document.getElementById("colors").value;
-      let quantity = document.getElementById("quantity").value;
+      let quantity = parseInt(document.getElementById("quantity").value);
+      let price = parseInt(document.getElementById("price").textContent);
 
-      let alreadyReserv = 0;
-
-      // On met a jour la nouvelle valeur de quantité de ce produit s'il est déja dans le localstorage
-      for (let reservs of panierJson) {
-        if (reservs[0] == iditem && reservs[1] == color) {
-          reservs[2] =  parseInt(reservs[2]) + parseInt(quantity);
-          alreadyReserv=1;
-        }
+      const data = {
+        id: iditem,
+        color: color,
+        quantity: quantity,
+        price: price
       }
 
-      // Si le produit n'est pas encore dans le local storage on le rajoute avec la nouvelle valeur de quantité
-      if(alreadyReserv == 0){
-        let newitem = [iditem,color,quantity];
-        panierJson.push(newitem);
-      }
-      
-      localStorage.setItem("panier", JSON.stringify(panierJson));
+      storage.upsertCart(data);
+
     });
   })
 

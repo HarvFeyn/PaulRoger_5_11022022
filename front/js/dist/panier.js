@@ -1,14 +1,13 @@
-let utils = require("./utils");
-let panier = require("./gestionPanier");
-let panierJson = panier.panierJson;
-let priceitemall = 0;
-let quantityitemall = 0;
+let utils = require("../utils/utils");
+const storage = require("../utils/storage");
+
+let panierJson = storage.getCart();
 
 const updatPriceAll = () => {
   let qtydisplay = document.getElementById("totalQuantity");
-  qtydisplay.innerHTML = quantityitemall;
+  qtydisplay.innerHTML = storage.getNbrItem();
   let pricedisplay = document.getElementById("totalPrice");
-  pricedisplay.innerHTML = priceitemall;
+  pricedisplay.innerHTML = storage.getPriceAll();
 }
 
 fetch("http://localhost:3000/api/products/")
@@ -16,26 +15,22 @@ fetch("http://localhost:3000/api/products/")
     return res.json();
   })
   .then(function(value) {
-    
-    let increm = 0;
 
     // On boucle sur toutes les commandes dans le panier
     for (let reservs of panierJson) {
-
+      
       // On cherche le produit correspondant depuis la requette get a l'API pour avoir les spécificité du produit
       for(let product of value) {
-        if(product._id == reservs[0]) {
+        
+        if(product._id == reservs.id) {
           // On construit les élément du DOM correspondant a cette commande
-          let localincrem = increm;
-          quantityitemall += parseInt(reservs[2]);
-          priceitemall += parseInt(reservs[2])*parseInt(product.price);
-
+          
           let elt = document.getElementById("cart__items");
 
           const eltarticle = document.createElement("article");
           eltarticle.setAttribute("class", "cart__item");
-          eltarticle.setAttribute("data-id", reservs[0]);
-          eltarticle.setAttribute("data-color", reservs[1]);
+          eltarticle.setAttribute("data-id", reservs.id);
+          eltarticle.setAttribute("data-color", reservs.color);
 
           const divimg = document.createElement("div");
           divimg.setAttribute("class", "cart__item__img");
@@ -57,7 +52,7 @@ fetch("http://localhost:3000/api/products/")
           divdesc.appendChild(producttitre);
 
           const productcolor = document.createElement("p");
-          productcolor.innerHTML = reservs[1];
+          productcolor.innerHTML = reservs.color;
           divdesc.appendChild(productcolor);
 
           const productprice = document.createElement("p");
@@ -73,7 +68,7 @@ fetch("http://localhost:3000/api/products/")
           divquantity.setAttribute("class","cart__item__content__settings__quantity");
 
           const producquantity = document.createElement("p");
-          producquantity.innerHTML = "Qté : " + reservs[2];
+          producquantity.innerHTML = "Qté : ";
           divquantity.appendChild(producquantity);
 
           const inputquantity = document.createElement("input");
@@ -82,17 +77,20 @@ fetch("http://localhost:3000/api/products/")
           inputquantity.setAttribute("name","itemQuantity");
           inputquantity.setAttribute("min","1");
           inputquantity.setAttribute("max","100");
-          inputquantity.setAttribute("value",reservs[2]);
+          inputquantity.setAttribute("value",reservs.quantity);
           divquantity.appendChild(inputquantity);
 
+          
+
           // On ajoute un eventlistener pour mettre a jour les quantité de ce produit de manière dynamique
-          inputquantity.addEventListener('change', function(){
-            let diffNbr = panierJson[localincrem][2] - inputquantity.value;
-            producquantity.innerHTML = "Qté : " + inputquantity.value;
-            panierJson[localincrem][2] = inputquantity.value;
-            localStorage.setItem("panier", JSON.stringify(panierJson));
-            quantityitemall -= diffNbr;
-            priceitemall -= parseInt(product.price)*diffNbr;
+          inputquantity.addEventListener('change', event => {
+
+            const article = event.target.closest("article");
+            const id = article.dataset.id;
+            const color = article.dataset.color;
+
+            storage.upsertCart({id, color}, inputquantity.value);
+
             updatPriceAll();
           });
 
@@ -107,11 +105,14 @@ fetch("http://localhost:3000/api/products/")
           divdelete.appendChild(deleteitem);
 
           // On ajoute un eventlistener pour supprimer cette commande de manière dynamique
-          deleteitem.addEventListener("click", function(){
-            quantityitemall -= panierJson[localincrem][2];
-            priceitemall -= parseInt(product.price)*panierJson[localincrem][2];
-            panierJson.splice(localincrem,1);
-            localStorage.setItem("panier", JSON.stringify(panierJson));
+          deleteitem.addEventListener("click", event => {
+
+            const article = event.target.closest("article");
+            const id = article.dataset.id;
+            const color = article.dataset.color;
+
+            storage.deleteItem({id, color});
+
             updatPriceAll();
             deleteitem.closest("article").remove();
           }); 
@@ -125,13 +126,11 @@ fetch("http://localhost:3000/api/products/")
           elt.appendChild(eltarticle);
         }
       }
-
-      increm++;
-
+      
     }
-
+    
     updatPriceAll();
-
+    
   })
   .catch(function(err) {
     console.log("erreur")
@@ -139,9 +138,11 @@ fetch("http://localhost:3000/api/products/")
 
 // On écoute le bouton pour finaliser la commande
 let orderbtn = document.getElementById("order");
-orderbtn.addEventListener("click", function(){
+orderbtn.addEventListener("click", event => {
 
+  event.preventDefault();
   let isvalide = true;
+  
 
   if(!utils.verifyname(document.getElementById("firstName").value)){
     document.getElementById("firstNameErrorMsg").innerHTML = "Veuillez remplir un prénom valide";
@@ -170,37 +171,38 @@ orderbtn.addEventListener("click", function(){
 
   if(isvalide){
 
-  }
+    const productsToPost = storage.getProductToPost();
 
-  let objectPost = {
-    contact: {
-      firstName: "test",
-      lastName: "test",
-      address: "test",
-      city: "test",
-      email: "test@gmail.com",
-    },
-    products: ["a6ec5b49bd164d7fbe10f37b6363f9fb"]
-  };
+    let objectPost = {
+      contact: {
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        address: document.getElementById("address").value,
+        city: document.getElementById("city").value,
+        email: document.getElementById("email").value,
+      },
+      products: productsToPost
+    };
+    
+    let jsonobj = JSON.stringify(objectPost);
   
-  let jsonobj = JSON.stringify(objectPost);
-  
-  fetch("http://localhost:3000/api/order", {
-    method: "POST",
-    headers: { 
-      'Accept': 'application/json', 
-      'Content-Type': 'application/json',
-    },
-    body: jsonobj
-  })
-  .then(function(res) {
-    console.log("oui")
-    console.log(res)
-    window.location.href = "./confirmation.html?comm=" + "123456789";
-  })
-  .catch(function(err) {
-    console.log("non")
-    console.log(err)
-  });
+    fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      headers: { 
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: jsonobj
+    })
+    .then(res => res.json()) 
+    .then(function(res) {
+      console.log(JSON.stringify(res));
+      window.location.href = "./confirmation.html?comm=" + res.orderId;
+    })
+    .catch(function(err) {
+      console.log("non")
+      console.log(err)
+    });
+  }
 
 });
