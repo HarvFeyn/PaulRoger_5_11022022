@@ -1,4 +1,4 @@
-let utils = require("../utils/utils");
+const utils = require("../utils/utils");
 const storage = require("../utils/storage");
 
 // La requéte pour récupérer le produit correspondant a l'id présent dans l'url
@@ -46,8 +46,10 @@ fetch("http://localhost:3000/api/products/" + utils.id)
       let quantity = parseInt(document.getElementById("quantity").value);
       let price = parseInt(document.getElementById("price").textContent);
 
-      // On construit l'objet à sauvegrarder dans le localstorage
-      const data = {
+      if(color && parseInt(quantity)>0 ){
+        
+        // On construit l'objet à sauvegrarder dans le localstorage
+        const data = {
         id: iditem,
         color: color,
         quantity: quantity,
@@ -56,6 +58,7 @@ fetch("http://localhost:3000/api/products/" + utils.id)
 
       // On appel la fonction qui met a jour le local storage
       storage.upsertCart(data);
+      }
 
     });
   })

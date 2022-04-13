@@ -1,15 +1,15 @@
-let utils = require("../utils/utils");
+const utils = require("../utils/utils");
 const storage = require("../utils/storage");
 
 // On appel la fonction pour récupérer le panier depuis le localstorage
-let panierJson = storage.getCart();
+const panierJson = storage.getCart();
 
 // Fonction pour mettre à jour l'afficage du prix et quantité d'item total
 const updatPriceAll = () => {
-  let qtydisplay = document.getElementById("totalQuantity");
+  const qtydisplay = document.getElementById("totalQuantity");
   // On appel la fonction qui compte le nombre d'item et on met a jour le DOM
   qtydisplay.innerHTML = storage.getNbrItem();
-  let pricedisplay = document.getElementById("totalPrice");
+  const pricedisplay = document.getElementById("totalPrice");
   // On appel la fonction qui compte le prix total et on met a jour le DOM
   pricedisplay.innerHTML = storage.getPriceAll();
 }
@@ -21,10 +21,10 @@ fetch("http://localhost:3000/api/products/")
   .then(function(value) {
 
     // On boucle sur toutes les commandes dans le panier
-    for (let reservs of panierJson) {
+    for (const reservs of panierJson) {
       
       // On cherche le produit correspondant depuis la requette get a l'API pour avoir les spécificité du produit
-      for(let product of value) {
+      for(const product of value) {
         
         if(product._id == reservs.id) {
 
@@ -210,11 +210,13 @@ orderbtn.addEventListener("click", event => {
       body: jsonobj
     })
     .then(res => res.json()) 
-    .then(function(res) {
+    .then( res => {
+      // On supprime le localstorage pour vider le panier
+      localStorage.clear();
       // Si la requéte est bien passée on renvoi vers la page de validation de commande avec le numéro de commande en url
       window.location.href = "./confirmation.html?comm=" + res.orderId;
     })
-    .catch(function(err) {
+    .catch( err => {
       console.log(err)
     });
   }

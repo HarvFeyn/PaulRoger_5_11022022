@@ -1,13 +1,22 @@
 const _ = require("lodash");
 
-// Fonction pour récupérer le panier depuis le local storage
+/**
+ * Fonction pour récupérer le panier depuis le local storage
+ * 
+ * @returns {Array}
+ */
 const getCart = () => {
    const cart = JSON.parse(localStorage.getItem("panier")) === null ? [] : JSON.parse(localStorage.getItem("panier"));
 
    return cart;
 };
 
-// Fonction pour mettre à jour le panier avec un nouvel item ou mettre à jour un item déjà existant
+/**
+ * Fonction pour mettre à jour le panier avec un nouvel item ou mettre à jour un item déjà existant
+ * 
+ * @param {object} item
+ * @param {number} quantityValue
+ */
 const upsertCart = (item, quantityValue) => {
 
     // on récupére le panier depuis le local storage
@@ -33,8 +42,11 @@ const upsertCart = (item, quantityValue) => {
    localStorage.setItem("panier", JSON.stringify(cart));
 };
 
-
-// Fonction pour supprimer un item du panier
+/**
+ * Fonction pour supprimer un item du panier
+ * 
+ * @param {object} query
+ */
 const deleteItem = query => {
 
     // on récupére le panier
@@ -47,7 +59,11 @@ const deleteItem = query => {
     localStorage.setItem("panier", JSON.stringify(cart));
 };
 
-// Fonction pour compter le nombre d'item dans le panier
+/**
+ * Fonction pour compter le nombre d'item dans le panier
+ * 
+ * @returns {Number}
+ */
 const getNbrItem = () => {
     let nbrItem = 0;
     // On récupére le panier
@@ -60,7 +76,11 @@ const getNbrItem = () => {
     return nbrItem;
 };
 
-// Fonction pour calculer le prix total du panier
+/**
+ * Fonction pour calculer le prix total du panier
+ * 
+ * @returns {Number}
+ */
 const getPriceAll = () => {
     let priceAll = 0;
     // On récupére le panier
@@ -74,7 +94,11 @@ const getPriceAll = () => {
 };
 
 
-// Fonction pour créer l'objet a envoyer a l'API
+/**
+ * Fonction pour créer l'objet a envoyer a l'API
+ * 
+ * @returns {Object}
+ */
 const getProductToPost = () => {
     let productToPost = [];
     const panier = getCart();
