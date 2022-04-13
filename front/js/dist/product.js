@@ -1,16 +1,14 @@
-let utils = require("./utils");
-let panier = require("./gestionPanier");
-let panierJson = panier.panierJson;
+const utils = require("../utils/utils");
+const storage = require("../utils/storage");
 
-console.log(panierJson)
-
+// La requéte pour récupérer le produit correspondant a l'id présent dans l'url
 fetch("http://localhost:3000/api/products/" + utils.id)
   .then(function(res) {
     return res.json();
   })
   .then(function(value) {
+
     // On construit les éléments du DOM pour le produits spécifique
-    
     const newEltimage = document.createElement("img");
     newEltimage.src=value.imageUrl;
     newEltimage.alt=value.altTxt;
@@ -36,34 +34,32 @@ fetch("http://localhost:3000/api/products/" + utils.id)
     return value;
   })
   .then(function(value) {
+
     // On écoute l'évenement sur le bouton pour ajouter des articles au panier
 
     let eltbtn = document.getElementById("addToCart");
 
     eltbtn.addEventListener('click', function(event) {
       event.preventDefault();
-
       let iditem = value._id;
       let color = document.getElementById("colors").value;
-      let quantity = document.getElementById("quantity").value;
+      let quantity = parseInt(document.getElementById("quantity").value);
+      let price = parseInt(document.getElementById("price").textContent);
 
-      let alreadyReserv = 0;
-
-      // On met a jour la nouvelle valeur de quantité de ce produit s'il est déja dans le localstorage
-      for (let reservs of panierJson) {
-        if (reservs[0] == iditem && reservs[1] == color) {
-          reservs[2] =  parseInt(reservs[2]) + parseInt(quantity);
-          alreadyReserv=1;
-        }
+      if(color && parseInt(quantity)>0 ){
+        
+        // On construit l'objet à sauvegrarder dans le localstorage
+        const data = {
+        id: iditem,
+        color: color,
+        quantity: quantity,
+        price: price
       }
 
-      // Si le produit n'est pas encore dans le local storage on le rajoute avec la nouvelle valeur de quantité
-      if(alreadyReserv == 0){
-        let newitem = [iditem,color,quantity];
-        panierJson.push(newitem);
+      // On appel la fonction qui met a jour le local storage
+      storage.upsertCart(data);
       }
-      
-      localStorage.setItem("panier", JSON.stringify(panierJson));
+
     });
   })
 

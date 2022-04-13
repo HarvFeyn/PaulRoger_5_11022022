@@ -1,4 +1,5 @@
-let utils = require("./utils");
+const utils = require("../utils/utils");
 
-let elt = document.getElementById("orderId");
+// On rajoute le numéro de la commande sur la page
+const elt = document.getElementById("orderId");
 elt.innerHTML =  utils.comm;
