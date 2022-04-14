@@ -8,7 +8,12 @@ const id = url.searchParams.get("id");
 const comm = url.searchParams.get("comm");
 
 
-// Fonction pour vérifier le format nom/prénom/ville/adresse
+/**
+ * Fonction pour vérifier le format nom/prénom/ville/adresse
+ * 
+ * @param {string} input
+ * @returns {Boolean}
+ */
 const verifyname = (input) => {
 
   // La regex qui vérifie le bon format
@@ -26,7 +31,13 @@ const verifyname = (input) => {
   }
 }
 
-// Fonction pour vérifier le format mail
+
+/**
+ * Fonction pour vérifier le format mail
+ * 
+ * @param {string} input
+ * @returns {Boolean}
+ */
 const verifyemail = (input) => {
   
   // La regex qui vérifie le bon format
