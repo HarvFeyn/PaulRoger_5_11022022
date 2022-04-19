@@ -147,78 +147,95 @@ fetch("http://localhost:3000/api/products/")
     console.log("erreur")
   });
 
-// On écoute le bouton pour finaliser la commande
-let orderbtn = document.getElementById("order");
-orderbtn.addEventListener("click", event => {
-
-  // On empéche le fonctionnement normal du bouton pour éviter une actualisation de la page
-  event.preventDefault();
-  let isvalide = true;
+  const firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
+  const lastNameErrorMsg = document.getElementById("lastNameErrorMsg");
+  const addressErrorMsg = document.getElementById("addressErrorMsg");
+  const cityErrorMsg = document.getElementById("cityErrorMsg");
+  const emailErrorMsg = document.getElementById("emailErrorMsg");
   
-  // On vérifie tous les paramètres entré dans le formulaire pour qu'ils correspondent bien aux formats attendu
-  if(!utils.verifyname(document.getElementById("firstName").value)){
-    document.getElementById("firstNameErrorMsg").innerHTML = "Veuillez remplir un prénom valide";
-    isvalide = false;
-  }
-
-  if(!utils.verifyname(document.getElementById("lastName").value)){
-    document.getElementById("lastNameErrorMsg").innerHTML = "Veuillez remplir un nom valide";
-    isvalide = false;
-  }
-
-  if(!utils.verifyname(document.getElementById("address").value)){
-    document.getElementById("addressErrorMsg").innerHTML = "Veuillez remplir une adresse valide";
-    isvalide = false;
-  }
-
-  if(!utils.verifyname(document.getElementById("city").value)){
-    document.getElementById("cityErrorMsg").innerHTML = "Veuillez remplir ville valide";
-    isvalide = false;
-  }
+  /**
+   * Supprime les messages d'erreur du dom
+   */
+  const removeErrorsMsg = () => {
+      for (const element of[firstNameErrorMsg, lastNameErrorMsg, addressErrorMsg, cityErrorMsg, emailErrorMsg]) {
+          utils.empty(element);
+      }
+  };
   
-  if(!utils.verifyemail(document.getElementById("email").value)){
-    document.getElementById("emailErrorMsg").innerHTML = "Veuillez remplir une adresse email valide";
-    isvalide = false;
-  }
-
-  if(isvalide){
-
-    // On construit l'objet a envoyer a l'API
-    const productsToPost = storage.getProductToPost();
-
-    let objectPost = {
-      contact: {
-        firstName: document.getElementById("firstName").value,
-        lastName: document.getElementById("lastName").value,
-        address: document.getElementById("address").value,
-        city: document.getElementById("city").value,
-        email: document.getElementById("email").value,
-      },
-      products: productsToPost
-    };
-    
-    // On transforme l'objet au format JSON pour l'envois a l'API
-    let jsonobj = JSON.stringify(objectPost);
+  // On écoute le bouton pour finaliser la commande
+  let orderbtn = document.getElementById("order");
+  orderbtn.addEventListener("click", event => {
   
-    // La requéte a l'API pour envoyer la commande
-    fetch("http://localhost:3000/api/products/order", {
-      method: "POST",
-      headers: { 
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: jsonobj
-    })
-    .then(res => res.json()) 
-    .then( res => {
-      // On supprime le localstorage pour vider le panier
-      localStorage.clear();
-      // Si la requéte est bien passée on renvoi vers la page de validation de commande avec le numéro de commande en url
-      window.location.href = "./confirmation.html?comm=" + res.orderId;
-    })
-    .catch( err => {
-      console.log(err)
-    });
-  }
-
-});
+      // On empéche le fonctionnement normal du bouton pour éviter une actualisation de la page
+      event.preventDefault();
+      let isvalide = true;
+  
+      removeErrorsMsg();
+  
+      // On vérifie tous les paramètres entré dans le formulaire pour qu'ils correspondent bien aux formats attendu
+      if (!utils.verifyname(document.getElementById("firstName").value)) {
+          firstNameErrorMsg.innerHTML = "Veuillez remplir un prénom valide";
+          isvalide = false;
+      }
+  
+      if (!utils.verifyname(document.getElementById("lastName").value)) {
+          lastNameErrorMsg.innerHTML = "Veuillez remplir un nom valide";
+          isvalide = false;
+      }
+  
+      if (!utils.verifyname(document.getElementById("address").value)) {
+          addressErrorMsg.innerHTML = "Veuillez remplir une adresse valide";
+          isvalide = false;
+      }
+  
+      if (!utils.verifyname(document.getElementById("city").value)) {
+          cityErrorMsg.innerHTML = "Veuillez remplir ville valide";
+          isvalide = false;
+      }
+  
+      if (!utils.verifyemail(document.getElementById("email").value)) {
+          emailErrorMsg.innerHTML = "Veuillez remplir une adresse email valide";
+          isvalide = false;
+      }
+  
+      if (isvalide) {
+  
+          // On construit l'objet a envoyer a l'API
+          const productsToPost = storage.getProductToPost();
+  
+          let objectPost = {
+              contact: {
+                  firstName: document.getElementById("firstName").value,
+                  lastName: document.getElementById("lastName").value,
+                  address: document.getElementById("address").value,
+                  city: document.getElementById("city").value,
+                  email: document.getElementById("email").value,
+              },
+              products: productsToPost
+          };
+  
+          // On transforme l'objet au format JSON pour l'envois a l'API
+          let jsonobj = JSON.stringify(objectPost);
+  
+          // La requéte a l'API pour envoyer la commande
+          fetch("http://localhost:3000/api/products/order", {
+                  method: "POST",
+                  headers: {
+                      'Accept': 'application/json',
+                      'Content-Type': 'application/json'
+                  },
+                  body: jsonobj
+              })
+              .then(res => res.json())
+              .then(res => {
+                  // On supprime le localstorage pour vider le panier
+                  localStorage.clear();
+                  // Si la requéte est bien passée on renvoi vers la page de validation de commande avec le numéro de commande en url
+                  window.location.href = "./confirmation.html?comm=" + res.orderId;
+              })
+              .catch(err => {
+                  console.log(err)
+              });
+      }
+  
+  });
