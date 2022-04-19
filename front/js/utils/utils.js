@@ -14,22 +14,7 @@ const comm = url.searchParams.get("comm");
  * @param {string} input
  * @returns {Boolean}
  */
-const verifyname = (input) => {
-
-  // La regex qui vérifie le bon format
-  var validRegex = /^(?=.{1,50}$)[a-z]+(?:['_.\s][a-z]+)*$/i;
-
-  // Si l'entrée match la regex on retourne vrai sinon faux
-  if (input.match(validRegex)) {
-
-    return true;
-
-  } else {
-
-    return false;
-
-  }
-}
+const verifyname = input => /^(?=.{1,50}$)[a-z]+(?:['_.\s][a-z]+)*$/i.test(input);
 
 
 /**
@@ -38,29 +23,25 @@ const verifyname = (input) => {
  * @param {string} input
  * @returns {Boolean}
  */
-const verifyemail = (input) => {
-  
-  // La regex qui vérifie le bon format
-  var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+const verifyemail = (input) => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(input);
 
-  // Si l'entrée match la regex on retourne vrai sinon faux
-  if (input.match(validRegex)) {
-
-    return true;
-
-  } else {
-
-    return false;
-
-  }
-
-}
+/**
+ * Supprime le first child de l'élement envoyé en paramètre
+ * 
+ * @param {HTMLElement} el - target element html with all first child to remove
+ */
+const empty = el => {
+    while (el.firstChild) {
+        el.removeChild(el.firstChild);
+    }
+};
 
 // les fct et variable a exporter
 module.exports = {
-  url,
-  id,
-  comm,
-  verifyemail,
-  verifyname,
+    url,
+    id,
+    comm,
+    verifyemail,
+    verifyname,
+    empty
 };
