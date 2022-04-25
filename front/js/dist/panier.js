@@ -5,13 +5,13 @@ const storage = require("../utils/storage");
 const panierJson = storage.getCart();
 
 // Fonction pour mettre à jour l'afficage du prix et quantité d'item total
-const updatPriceAll = () => {
+const updatPriceAll = async () => {
   const qtydisplay = document.getElementById("totalQuantity");
   // On appel la fonction qui compte le nombre d'item et on met a jour le DOM
   qtydisplay.innerHTML = storage.getNbrItem();
   const pricedisplay = document.getElementById("totalPrice");
   // On appel la fonction qui compte le prix total et on met a jour le DOM
-  pricedisplay.innerHTML = storage.getPriceAll();
+  pricedisplay.innerHTML = await storage.getPriceAll();
 }
 
 fetch("http://localhost:3000/api/products/")
@@ -161,7 +161,7 @@ fetch("http://localhost:3000/api/products/")
           utils.empty(element);
       }
   };
-  
+
   // On écoute le bouton pour finaliser la commande
   let orderbtn = document.getElementById("order");
   orderbtn.addEventListener("click", event => {
@@ -197,45 +197,51 @@ fetch("http://localhost:3000/api/products/")
           emailErrorMsg.innerHTML = "Veuillez remplir une adresse email valide";
           isvalide = false;
       }
-  
-      if (isvalide) {
+
+      const productsToPost = storage.getProductToPost();
+
+      if (productsToPost.length > 0) {
   
           // On construit l'objet a envoyer a l'API
-          const productsToPost = storage.getProductToPost();
-  
-          let objectPost = {
-              contact: {
-                  firstName: document.getElementById("firstName").value,
-                  lastName: document.getElementById("lastName").value,
-                  address: document.getElementById("address").value,
-                  city: document.getElementById("city").value,
-                  email: document.getElementById("email").value,
-              },
-              products: productsToPost
-          };
-  
-          // On transforme l'objet au format JSON pour l'envois a l'API
-          let jsonobj = JSON.stringify(objectPost);
-  
-          // La requéte a l'API pour envoyer la commande
-          fetch("http://localhost:3000/api/products/order", {
-                  method: "POST",
-                  headers: {
-                      'Accept': 'application/json',
-                      'Content-Type': 'application/json'
-                  },
-                  body: jsonobj
-              })
-              .then(res => res.json())
-              .then(res => {
-                  // On supprime le localstorage pour vider le panier
-                  localStorage.clear();
-                  // Si la requéte est bien passée on renvoi vers la page de validation de commande avec le numéro de commande en url
-                  window.location.href = "./confirmation.html?comm=" + res.orderId;
-              })
-              .catch(err => {
-                  console.log(err)
-              });
+
+          if (productsToPost) {
+
+            let objectPost = {
+                contact: {
+                    firstName: document.getElementById("firstName").value,
+                    lastName: document.getElementById("lastName").value,
+                    address: document.getElementById("address").value,
+                    city: document.getElementById("city").value,
+                    email: document.getElementById("email").value,
+                },
+                products: productsToPost
+            };
+    
+            // On transforme l'objet au format JSON pour l'envois a l'API
+            let jsonobj = JSON.stringify(objectPost);
+          
+          
+                // La requéte a l'API pour envoyer la commande
+              fetch("http://localhost:3000/api/products/order", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: jsonobj
+            })
+            .then(res => res.json())
+            .then(res => {
+                // On supprime le localstorage pour vider le panier
+                localStorage.clear();
+                // Si la requéte est bien passée on renvoi vers la page de validation de commande avec le numéro de commande en url
+                window.location.href = "./confirmation.html?comm=" + res.orderId;
+            })
+            .catch(err => {
+                console.log(err)
+            });
+          }
+
       }
   
   });

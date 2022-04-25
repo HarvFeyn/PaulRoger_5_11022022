@@ -44,20 +44,20 @@ fetch("http://localhost:3000/api/products/" + utils.id)
       let iditem = value._id;
       let color = document.getElementById("colors").value;
       let quantity = parseInt(document.getElementById("quantity").value);
-      let price = parseInt(document.getElementById("price").textContent);
 
       if(color && parseInt(quantity)>0 ){
         
         // On construit l'objet à sauvegrarder dans le localstorage
         const data = {
-        id: iditem,
-        color: color,
-        quantity: quantity,
-        price: price
-      }
+          id: iditem,
+          color: color,
+          quantity: quantity
+        } 
 
-      // On appel la fonction qui met a jour le local storage
-      storage.upsertCart(data);
+        // On appel la fonction qui met a jour le local storage
+        storage.upsertCart(data);
+
+        window.alert("Article ajouté au panier");
       }
 
     });
