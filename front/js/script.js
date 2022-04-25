@@ -10,27 +10,33 @@ if (utils.url.href.includes("index.html")) {
   
   require("./dist/index");
   
-};
+}
 
 // Javascript a executer sur la page product (on récupére l'id du produit dans l'url)
-if (utils.id !== null) {
+else if (utils.id !== null) {
   
   require("./dist/product");
 
-};
+}
 
 // Le javascript executer sur la page panier
 
-if (utils.url.href.includes("cart.html")) {
+else if (utils.url.href.includes("cart.html")) {
 
   require("./dist/panier");
 
-};
+}
 
 // Le javascript executer sur la page confirmation
 
-if (utils.url.href.includes("confirmation.html")) {
+else if (utils.url.href.includes("confirmation.html")) {
 
   require("./dist/confirm");
 
+}
+
+else {
+
+  require("./dist/index");
+  
 };

@@ -76,21 +76,44 @@ const getNbrItem = () => {
     return nbrItem;
 };
 
+
 /**
  * Fonction pour calculer le prix total du panier
  * 
  * @returns {Number}
  */
-const getPriceAll = () => {
-    let priceAll = 0;
+const getPriceAll = async () => {
+
     // On récupére le panier
     const panier = getCart();
-    // Pour chaque item on rajoute son prix multiplié par la quantité
-    for (let reserv of panier) {
-        priceAll += ( reserv.price * reserv.quantity );
-    }
+    
+    const priceAll = await fetch("http://localhost:3000/api/products/")
+        .then(function(res) {
+            return res.json();
+        })
+        .then(function(value) {
+            
+            var priceCalcul = 0;
+            for (const item of panier) {
+
+                for(const product of value) {
+        
+                    if(product._id == item.id) {
+                        // Pour chaque item on rajoute son prix multiplié par la quantité
+                        priceCalcul += ( product.price * item.quantity );
+                    }
+
+                }
+            }
+            return priceCalcul;
+        })
+        .catch(function(err) {
+          console.log("erreur")
+        });
+
     // On retourne le prix total
     return priceAll;
+    
 };
 
 
